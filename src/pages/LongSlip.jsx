@@ -1,18 +1,251 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, Card, Typography, message, Layout, Form } from 'antd';
+import { Table, Input, Button, Card, Typography, message, Layout, Row, Col, DatePicker, Form } from 'antd';
 import { PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import cmtiLogo from '../assets/cmti.webp';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Header, Content } = Layout;
+
+// Separate CalibrationDetails component
+const CalibrationDetails = ({ setCalibrationData }) => {
+  const [formData, setFormData] = useState({
+    ulrNumber: "",
+    certificateNumber: "",
+    date: "",
+    customerName: "",
+    customerAddress: "",
+    itemDescription: "",
+    identificationNumber: "",
+    serialNumber: "",
+    customerReference: "",
+    calibrationDate: "",
+    calibrationPlace: "",
+    referenceDocument: "",
+    temperature: "",
+    uncertainty: "",
+  });
+
+  const [equipmentList, setEquipmentList] = useState([{ id: 1, value: "" }]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+    setCalibrationData(updatedFormData);  // Lift state up
+  };
+
+  const handleEquipmentChange = (id, value) => {
+    setEquipmentList((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, value } : item))
+    );
+  };
+
+  const addEquipmentRow = () => {
+    setEquipmentList([...equipmentList, { id: Date.now(), value: "" }]);
+  };
+
+  const removeEquipmentRow = (id) => {
+    setEquipmentList(equipmentList.filter((item) => item.id !== id));
+  };
+
+  return (
+    <Card style={{ width: "100%", padding: "20px", position: "relative" }}>
+      <Row gutter={16} style={{ marginBottom: "20px" }}>
+        {/* ULR No (Left) */}
+        <Col span={8} style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+          <Title level={5} style={{ marginRight: "10px", whiteSpace: "nowrap", flexShrink: 0 }}>
+            <span style={{ color: "red" }}>*</span> ULR No:
+          </Title>
+          <Input
+            name="ulrNumber"
+            value={formData.ulrNumber}
+            onChange={handleChange}
+            style={{ width: "50%", marginTop: "20px" }} // Adjusted width
+          />
+        </Col>
+
+        {/* Certificate No (Center) */}
+        <Col span={8} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Title level={5} style={{ marginRight: "10px", whiteSpace: "nowrap", flexShrink: 0 }}>
+            CERTIFICATE NO:
+          </Title>
+          <Input
+            name="certificateNumber"
+            value={formData.certificateNumber}
+            onChange={handleChange}
+            style={{ width: "50%", marginTop: "20px" }} // Adjusted width
+          />
+        </Col>
+
+        {/* Date (Right) */}
+        <Col span={8} style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+          <Title level={5} style={{ marginRight: "10px", whiteSpace: "nowrap", flexShrink: 0 }}>
+            DATE:
+          </Title>
+          <DatePicker
+            name="date"
+            onChange={(date, dateString) => {
+              setFormData({ ...formData, date: dateString });
+              setCalibrationData({ ...formData, date: dateString });
+            }}
+            style={{ width: "50%", marginTop: "20px" }} // Adjusted width
+          />
+        </Col>
+      </Row>
+
+      {/* Grouped Customer Details Box */}
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            Name & Address of the Customer:
+          </Text>
+          <Input.TextArea
+            name="customerNameAddress"
+            value={formData.customerName + "\n" + formData.customerAddress}
+            onChange={(e) => {
+              const [name, address] = e.target.value.split("\n");
+              setFormData({
+                ...formData,
+                customerName: name,
+                customerAddress: address || "", // Ensures address is set if present
+              });
+              setCalibrationData({
+                ...formData,
+                customerName: name,
+                customerAddress: address || "", // Update lifted state
+              });
+            }}
+            placeholder="Customer Name & Address"
+            rows={2} // Adjust the height of the text box (rows define the number of visible lines)
+            style={{ marginBottom: "5px" }}
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            Description of the Item:
+          </Text>
+          <Input
+            name="itemDescription"
+            value={formData.itemDescription}
+            onChange={handleChange}
+            placeholder="Item Description"
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            Identification & Serial No.:
+          </Text>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Input
+                name="identificationNumber"
+                value={formData.identificationNumber}
+                onChange={handleChange}
+                placeholder="Identification No."
+              />
+            </Col>
+
+            <Col span={12}>
+              <Input
+                name="serialNumber"
+                value={formData.serialNumber}
+                onChange={handleChange}
+                placeholder="Serial No."
+              />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+
+      {/* Calibration Details Section */}
+      <Row gutter={[16, 16]} style={{ marginTop: "20px" }}>
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            1. Calibration Date:
+          </Text>
+          <DatePicker
+            name="calibrationDate"
+            onChange={(date, dateString) => {
+              setFormData({ ...formData, calibrationDate: dateString });
+              setCalibrationData({ ...formData, calibrationDate: dateString });
+            }}
+            style={{ width: "100%" }}
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            2. Calibration Place:
+          </Text>
+          <Input
+            name="calibrationPlace"
+            value={formData.calibrationPlace}
+            onChange={handleChange}
+            placeholder="Calibration Place"
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            3. Reference Document:
+          </Text>
+          <Input
+            name="referenceDocument"
+            value={formData.referenceDocument}
+            onChange={handleChange}
+            placeholder="Reference Document"
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            4. Temperature:
+          </Text>
+          <Input
+            name="temperature"
+            value={formData.temperature}
+            onChange={handleChange}
+            placeholder="Temperature"
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            5. Uncertainty:
+          </Text>
+          <Input
+            name="uncertainty"
+            value={formData.uncertainty}
+            onChange={handleChange}
+            placeholder="Uncertainty"
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            6. Customer Reference:
+          </Text>
+          <Input
+            name="customerReference"
+            value={formData.customerReference}
+            onChange={handleChange}
+            placeholder="Customer Reference"
+          />
+        </Col>
+      </Row>
+    </Card>
+  );
+};
 
 const LongSlip = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([{ key: '1' }]);
-  const [testNo, setTestNo] = useState('');
   const [form] = Form.useForm();
+  const [calibrationData, setCalibrationData] = useState({});
 
   const handleAdd = () => {
     const newKey = Date.now().toString();
@@ -25,12 +258,8 @@ const LongSlip = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validate the form first to ensure test number is provided
-      await form.validateFields();
-      
       const formData = {
         certificate_id: 13,
-        test_number: parseInt(testNo),
         gauges: data.map(item => ({
           nominal_size: item.nominal_size || '',
           deviation_at_center: item.deviation_at_center || '',
@@ -50,12 +279,8 @@ const LongSlip = () => {
         navigate('/operator');
       }
     } catch (error) {
-      if (error.errorFields) {
-        message.error('Please fill in all required fields');
-      } else {
-        message.error('Failed to submit data');
-        console.error(error);
-      }
+      message.error('Failed to submit data');
+      console.error(error);
     }
   };
 
@@ -156,70 +381,24 @@ const LongSlip = () => {
 
   return (
     <Layout>
-      <Header style={{ 
-        background: '#fff', 
-        padding: '0 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-      }}>
+      <Header style={{ background: '#fff', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Button 
-            icon={<ArrowLeftOutlined />} 
-            onClick={() => navigate('/operator')}
-            type="text"
-          />
-          <img 
-            src={cmtiLogo} 
-            alt="CMTI Logo" 
-            style={{ height: '40px', width: 'auto' }} 
-          />
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/operator')} type="text" />
+          <img src={cmtiLogo} alt="CMTI Logo" style={{ height: '40px', width: 'auto' }} />
         </div>
-        <Title level={4} style={{ margin: 0 }}>Long Slip 125 to 300 Calibration</Title>
+        <Title level={4} style={{ margin: 0, fontSize: '18px' }}>Long Slip 125 to 300 Calibration</Title>
       </Header>
       
       <Content style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-        <Form form={form}>
-          <Card style={{ marginBottom: '24px' }}>
-            <Form.Item
-              label="Test No."
-              name="test_no"
-              rules={[{ required: true, message: 'Please input test number!' }]}
-            >
-              <Input 
-                placeholder="Enter test number" 
-                value={testNo}
-                onChange={(e) => setTestNo(e.target.value)}
-              />
-            </Form.Item>
-          </Card>
-        </Form>
-        
+        <CalibrationDetails setCalibrationData={setCalibrationData} />
         <Card>
           <Title level={3}>Mechanical Calibration</Title>
-          
           <Title level={4}>1. Calibration of Long Slip Gauges: <span style={{ fontSize: '14px' }}>(All values are in mm)</span></Title>
-          <Table
-            columns={columns}
-            dataSource={data}
-            pagination={false}
-            bordered
-          />
-          <Button
-            type="dashed"
-            onClick={handleAdd}
-            icon={<PlusOutlined />}
-            style={{ marginTop: '16px' }}
-          >
+          <Table columns={columns} dataSource={data} pagination={false} bordered />
+          <Button type="dashed" onClick={handleAdd} icon={<PlusOutlined />} style={{ marginTop: '16px' }}>
             Add Row
           </Button>
-
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            style={{ marginTop: '24px' }}
-          >
+          <Button type="primary" onClick={handleSubmit} style={{ marginTop: '24px', marginLeft: "10px" }}>
             Submit
           </Button>
         </Card>

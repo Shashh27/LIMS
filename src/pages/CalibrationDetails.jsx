@@ -1,0 +1,255 @@
+import React, { useState } from "react";
+import { Input, DatePicker, Card, Row, Col, Typography, Button } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
+
+const Calibration = () => {
+  const [formData, setFormData] = useState({
+    ulrNumber: "",
+    certificateNumber: "",
+    date: "",
+    sheet: "",
+    customerName: "",
+    customerAddress: "",
+    itemDescription: "",
+    identificationNumber: "",
+    serialNumber: "",
+    customerReference: "",
+    calibrationDate: "",
+    calibrationPlace: "",
+    referenceDocument: "",
+    temperature: "",
+    uncertainty: "",
+  });
+
+  const [equipmentList, setEquipmentList] = useState([{ id: 1, value: "" }]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleEquipmentChange = (id, value) => {
+    setEquipmentList((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, value } : item))
+    );
+  };
+
+  const addEquipmentRow = () => {
+    setEquipmentList([...equipmentList, { id: Date.now(), value: "" }]);
+  };
+
+  const removeEquipmentRow = (id) => {
+    setEquipmentList(equipmentList.filter((item) => item.id !== id));
+  };
+
+  return (
+    <Card style={{ width: "100%", padding: "20px", position: "relative" }}>
+      <Row gutter={16} style={{ marginBottom: "20px" }}>
+        {/* ULR No (Left) */}
+  <Col span={8} style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+    <Title level={5} style={{ marginRight: "10px", whiteSpace: "nowrap", flexShrink: 0 }}>
+      <span style={{ color: "red" }}>*</span> ULR No:
+    </Title>
+    <Input
+      name="ulrNumber"
+      value={formData.ulrNumber}
+      onChange={handleChange}
+      style={{ width: "50%",marginTop:"20px" }} // Adjusted width
+    />
+  </Col>
+
+  {/* Certificate No (Center) */}
+  <Col span={8} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <Title level={5} style={{ marginRight: "10px", whiteSpace: "nowrap", flexShrink: 0 }}>
+      CERTIFICATE NO:
+    </Title>
+    <Input
+      name="certificateNumber"
+      value={formData.certificateNumber}
+      onChange={handleChange}
+      style={{ width: "50%",marginTop:"20px" }} // Adjusted width
+    />
+  </Col>
+
+  {/* Date (Right) */}
+  <Col span={8} style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+    <Title level={5} style={{ marginRight: "10px", whiteSpace: "nowrap", flexShrink: 0 }}>
+      DATE:
+    </Title>
+    <DatePicker
+      name="date"
+      onChange={(date, dateString) => setFormData({ ...formData, date: dateString })}
+      style={{ width: "50%",marginTop:"20px" }} // Adjusted width
+    />
+  </Col>
+</Row>
+
+
+      {/* Grouped Customer Details Box */}
+      <Row gutter={[16, 16]}>
+      <Col span={24}>
+  <Text style={{ fontSize: "14px" }} strong>
+    Name & Address of the Customer:
+  </Text>
+  <Input.TextArea
+    name="customerNameAddress"
+    value={`${formData.customerName}\n${formData.customerAddress}`}
+    onChange={(e) => {
+      const [name, address] = e.target.value.split("\n");
+      setFormData({
+        ...formData,
+        customerName: name,
+        customerAddress: address || "", // Ensures address is set if present
+      });
+    }}
+    placeholder="Customer Name & Address"
+    rows={2} // Adjust the height of the text box (rows define the number of visible lines)
+    style={{ marginBottom: "5px" }}
+  />
+</Col>
+
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            Description of the Item:
+          </Text>
+          <Input
+            name="itemDescription"
+            value={formData.itemDescription}
+            onChange={handleChange}
+            placeholder="Item Description"
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }} strong>
+            Identification & Serial No.:
+          </Text>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Input
+                name="identificationNumber"
+                value={formData.identificationNumber}
+                onChange={handleChange}
+                placeholder="Identification No."
+              />
+            </Col>
+            
+            <Col span={12}>
+              <Input
+                name="serialNumber"
+                value={formData.serialNumber}
+                onChange={handleChange}
+                placeholder="Serial No."
+              />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+<br></br>
+      {/* Bottom Section */}
+      <Row gutter={[16, 16]} style={{ fontSize: "14px" }}>
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }}>
+            <span style={{ color: "red" }}>*</span><span style={{marginBottom:"50px"}}>1. Customer's Reference:</span>
+          </Text>
+          <Input
+            name="customerReference"
+            value={formData.customerReference}
+            onChange={handleChange}
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }}>
+            <span style={{ color: "red" }}>*</span> 2. Date & Place of Calibration:
+          </Text>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Input
+                name="calibrationDate"
+                value={formData.calibrationDate}
+                onChange={handleChange}
+                placeholder="Calibration Date"
+              />
+            </Col>
+            <Col span={12}>
+              <Input
+                name="calibrationPlace"
+                value={formData.calibrationPlace}
+                onChange={handleChange}
+                placeholder="Calibration Place"
+              />
+            </Col>
+          </Row>
+        </Col>
+
+        {/* Dynamic Equipment Details Section */}
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }}>
+            <span style={{ color: "red" }}>*</span> 3. Equipment Used for Calibration & Traceability:
+          </Text>
+
+          {equipmentList.map((item, index) => (
+            <Row key={item.id} gutter={16} align="middle" style={{ marginBottom: "10px" }}>
+              <Col span={22}>
+                <Input
+                  value={item.value}
+                  onChange={(e) => handleEquipmentChange(item.id, e.target.value)}
+                  placeholder="Enter Equipment Details"
+                />
+              </Col>
+              <Col span={2}>
+                {index > 0 && (
+                  <Button type="text" icon={<DeleteOutlined />} onClick={() => removeEquipmentRow(item.id)} />
+                )}
+              </Col>
+            </Row>
+          ))}
+
+          <Button type="dashed" onClick={addEquipmentRow} style={{ marginTop: "10px" }}>
+            + Add Row
+          </Button>
+        </Col>
+
+        {/* Other Input Fields */}
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }}>
+            <span style={{ color: "red" }}>*</span> 4. Reference Document:
+          </Text>
+          <Input
+            name="referenceDocument"
+            value={formData.referenceDocument}
+            onChange={handleChange}
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }}>
+            <span style={{ color: "red" }}>*</span> 5. Temperature during Calibration:
+          </Text>
+          <Input
+            name="temperature"
+            value={formData.temperature}
+            onChange={handleChange}
+          />
+        </Col>
+
+        <Col span={24}>
+          <Text style={{ fontSize: "14px" }}>
+            <span style={{ color: "red" }}>*</span> 6. Uncertainty of Measurement:
+          </Text>
+          <Input
+            name="uncertainty"
+            value={formData.uncertainty}
+            onChange={handleChange}
+          />
+        </Col>
+      </Row>
+    </Card>
+  );
+};
+
+export default Calibration;
