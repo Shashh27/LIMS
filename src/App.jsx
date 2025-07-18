@@ -56,13 +56,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/operator" element={<Operator/>} />
+        <Route path="/operator/*" element={<Operator/>} />
         
         {/* PPM Department Routes */}
         <Route path="/ppm-quotation" element={
-          <ProtectedRoute allowedDepartment="ppm">
             <PpmLayout />
-          </ProtectedRoute>
         }>
           <Route path="enquiry" element={<PpmEnquiry />} />
           <Route path="enquiry/add-quotation" element={<PpmGenerateReport />} />
@@ -71,16 +69,12 @@ function App() {
 
         {/* MNTM Department Routes */}
         <Route path="/quotation" element={
-          <ProtectedRoute allowedDepartment="mntm">
             <QuotationLayout />
-          </ProtectedRoute>
         }>
           <Route path="add-report" element={<GenerateReport />} />
           <Route path="reports" element={<Reports />} />
           <Route path="charges" element={
-            <ProtectedRoute allowedDepartment="mntm" allowedRoles={["supervisor" , "deo"]}>
               <Admin />
-            </ProtectedRoute>
           } />
           <Route path="supervisor" element={
             <ProtectedRoute allowedDepartment="mntm" allowedRoles={["supervisor"]}>

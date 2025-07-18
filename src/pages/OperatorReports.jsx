@@ -60,31 +60,31 @@ const OperatorReports = () => {
       let endpoint = '';
       switch(report.activity) {
         case 'Autocollimator Analoge':
-          endpoint = `/testing/autocollimator-analogue/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/autocollimatorAnalog/${report.test_no}`;
           break;
         case 'Autocollimator Digital':
-          endpoint = `/testing/autocollimator-digital/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/autocollimatordigital/${report.test_no}`;
           break;
         case 'Clinometer':
-          endpoint = `/testing/clinometer/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/clinometer/${report.test_no}`;
           break;
         case 'Depth Micro Checker':
-          endpoint = `/testing/depth-micro-checker/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/depth-micro-checker?test_number=${report.test_no}`;
           break;
         case 'Inclinometer Analoge':
-          endpoint = `/testing/inclinometer-analogue/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/inclinometer-analogue/?test_number=${report.test_no}`;
           break;
         case 'Inclinometer Digital':
-          endpoint = `/testing/inclinometer-digital/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/inclinometer-digital/report/${report.test_no}`;
           break;
         case 'Laser Micrometer':
-          endpoint = `/testing/LaserMicrometer/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/laser_micrometer/${report.test_no}`;
           break;
         case 'Length Bar':
-          endpoint = `/testing/lengthbar/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/lengthbar/${report.test_no}`;
           break;
         case 'Long Slip 300':
-          endpoint = `/testing/longslip300/${report.certificate_id}?test_no=${report.test_no}`;
+          endpoint = `/testing/longslip300/${report.test_no}`;
           break;
         case 'Spirit level':
           endpoint = `/testing/spiritlevel/${report.certificate_id}?test_no=${report.test_no}`;
@@ -222,16 +222,6 @@ const OperatorReports = () => {
 
   return (
     <Layout>
-      <Header style={{ 
-        background: '#fff', 
-        padding: '0 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-      }}>
-        <Title level={4} style={{ margin: 0 }}>View Reports</Title>
-      </Header>
       
       <Content style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
         <Card>

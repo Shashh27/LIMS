@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Card, Typography, Button, Row, Col, message } from 'antd';
-import { 
-  FileAddOutlined, 
-  FileSearchOutlined, 
-  MenuFoldOutlined, 
-  MenuUnfoldOutlined 
-} from '@ant-design/icons';
+import { Layout, Menu, Card, Typography, Row, Col } from 'antd';
+import { FileAddOutlined, FileSearchOutlined } from '@ant-design/icons';
 import cmtiLogo from '../assets/cmti.webp';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import OperatorReports from './OperatorReports';
-
-const { Header, Sider, Content } = Layout;
-const { Title } = Typography;
-const { Meta } = Card;
 
 // Import all images
 import autocollimatorAnalogeImg from '../assets/Autocollimator_analogue.gif';
@@ -34,7 +25,10 @@ import indexingTableImg from '../assets/Indexing_table.jpeg';
 import rotaryTableImg from '../assets/rt.jpg';
 import vernierCaliperImg from '../assets/Vernier_Caliper.jpg';
 
-// List of all activities with their image paths and routes
+const { Header, Content } = Layout;
+const { Title } = Typography;
+const { Meta } = Card;
+
 const activities = [
   {
     title: 'Autocollimator Analoge',
@@ -128,59 +122,77 @@ const activities = [
   }
 ];
 
-const Operator = () => {
-  const [selectedMenu, setSelectedMenu] = useState('add-report');
-  const [collapsed, setCollapsed] = useState(false);
+const AddReportContent = () => {
   const navigate = useNavigate();
-
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-  };
-
+  
   const handleActivityClick = (route) => {
     navigate(route);
   };
 
-  const AddReportContent = () => (
-    <div style={{ margin: '24px' }}>
-      <Title level={3} style={{ color: '#1565c0', marginBottom: '24px' }}>
+  return (
+    <div style={{ padding: '24px' }}>
+      <Title level={3} style={{ 
+        color: '#1565c0', 
+        marginBottom: '32px',
+        textAlign: 'center',
+        fontSize: '28px',
+        fontWeight: '600'
+      }}>
         Select Activity
       </Title>
       
-      <Row gutter={[16, 16]}>
+      <Row gutter={[24, 24]}>
         {activities.map((activity, index) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
             <Card
               hoverable
               style={{ 
                 height: '100%',
+                borderRadius: '12px',
+                overflow: 'hidden',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                 transition: 'all 0.3s'
               }}
-              cover={
+              bodyStyle={{
+                padding: '16px',
+                background: '#f8f9fa'
+              }}
+              onClick={() => handleActivityClick(activity.route)}
+              cover={(
                 <div style={{ 
-                  height: '160px', 
+                  height: '200px', 
                   overflow: 'hidden',
+                  position: 'relative',
+                  background: '#fff',
                   display: 'flex',
-                  justifyContent: 'center',
                   alignItems: 'center',
-                  background: '#f5f5f5'
+                  justifyContent: 'center'
                 }}>
                   <img
                     alt={activity.title}
                     src={activity.image}
                     style={{ 
-                      width: '100%',
-                      height: '100%',
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      padding: '16px'
                     }}
                   />
                 </div>
-              }
-              onClick={() => handleActivityClick(activity.route)}
+              )}
             >
               <Meta
-                title={activity.title}
-                style={{ textAlign: 'center' }}
+                title={
+                  <div style={{ 
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    color: '#2c3e50',
+                    textAlign: 'center',
+                    marginBottom: '0'
+                  }}>
+                    {activity.title}
+                  </div>
+                }
               />
             </Card>
           </Col>
@@ -188,75 +200,90 @@ const Operator = () => {
       </Row>
     </div>
   );
+};
+
+const Operator = () => {
+  const navigate = useNavigate();
+  const [selectedKey, setSelectedKey] = useState('add-report');
+
+  const handleMenuClick = ({ key }) => {
+    setSelectedKey(key);
+    if (key === 'view-reports') {
+      navigate('/operator/reports');
+    } else {
+      navigate('/operator');
+    }
+  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
-        theme="light" 
-        width={200} 
-        collapsed={collapsed}
-        collapsible
-        trigger={null}
-        style={{ 
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0
-        }}
-      >
+      <Header style={{ 
+        background: '#fff',
+        padding: '0 24px',
+        display: 'flex',
+        alignItems: 'center',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000
+      }}>
         <div style={{ 
-          padding: '16px', 
-          textAlign: 'center',
-          display: 'flex',
-          justifyContent: collapsed ? 'center' : 'space-between',
-          alignItems: 'center'
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto'
         }}>
-          <img 
-            src={cmtiLogo} 
-            alt="CMTI Logo" 
-            style={{ 
-              width: collapsed ? '50px' : '100px', 
-              height: collapsed ? '40px' : '80px',
-              transition: 'all 0.2s'
-            }} 
-          />
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={toggleCollapsed}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img 
+              src={cmtiLogo} 
+              alt="CMTI Logo" 
+              style={{ 
+                height: '40px',
+                marginRight: '32px'
+              }} 
+            />
+            <Menu
+              mode="horizontal"
+              selectedKeys={[selectedKey]}
+              onClick={handleMenuClick}
+              items={[
+                {
+                  key: 'add-report',
+                  icon: <FileAddOutlined />,
+                  label: 'Add Report',
+                  style: { fontSize: '16px', padding: '0 24px' }
+                },
+                {
+                  key: 'view-reports',
+                  icon: <FileSearchOutlined />,
+                  label: 'View Reports',
+                  style: { fontSize: '16px', padding: '0 24px' }
+                }
+              ]}
+              style={{ 
+                border: 'none',
+                background: 'transparent',
+                fontWeight: '500'
+              }}
+            />
+          </div>
         </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedMenu]}
-          onClick={({ key }) => setSelectedMenu(key)}
-          items={[
-            {
-              key: 'add-report',
-              icon: <FileAddOutlined />,
-              label: 'Add Report'
-            },
-            {
-              key: 'view-reports',
-              icon: <FileSearchOutlined />,
-              label: 'View Reports'
-            }
-          ]}
-          style={{ borderRight: 0 }}
-        />
-      </Sider>
-      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.2s' }}>
-        <Content style={{ background: '#f5f5f5', minHeight: '100vh' }}>
-          {selectedMenu === 'add-report' ? <AddReportContent /> : <OperatorReports />}
-        </Content>
-      </Layout>
+      </Header>
+
+      <Content style={{ 
+        background: '#f5f5f5', 
+        minHeight: '100vh',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        width: '100%'
+      }}>
+        <Routes>
+          <Route path="/" element={<AddReportContent />} />
+          <Route path="/reports" element={<OperatorReports />} />
+        </Routes>
+      </Content>
     </Layout>
   );
 };
